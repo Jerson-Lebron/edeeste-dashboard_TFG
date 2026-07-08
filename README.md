@@ -10,7 +10,7 @@ Este proyecto es el trabajo final de grado para la carrera de **Analítica y Cie
 
 El dashboard muestra indicadores clave de EDEESTE como averías, bajas de servicio, pérdidas energéticas y energía entregada. La herramienta permite filtrar por provincia, período y tipo de avería, y visualizar los datos en gráficos interactivos y mapas geográficos.
 
-**Periodo de análisis:** 2017 - 2026
+**Periodo de análisis:** 2017 - 2025
 
 ---
 
