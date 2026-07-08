@@ -16,7 +16,7 @@ El dashboard muestra indicadores clave de EDEESTE como averías, bajas de servic
 
 ## Funcionalidades
 
-###Página 1: Resumen Ejecutivo
+## Página 1: Resumen Ejecutivo
 - KPIs principales (total averías, total bajas, pérdida % y energía entregada)
 - Evolución temporal de energía comprada, facturada, cobrada y pérdidas
 - Distribución de energía facturada vs pérdidas
