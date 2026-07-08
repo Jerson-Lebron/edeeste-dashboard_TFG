@@ -57,21 +57,26 @@ El dashboard muestra indicadores clave de EDEESTE como averías, bajas de servic
 
 ```
 dashboard-edeeste/
-├── app.py                         
+├── app.py
 ├── pages/
-│   ├── resumen.py                  
-│   ├── energia.py                  
+│   ├── resumen.py                
+│   ├── energia.py                 
 │   └── inteligencia_geo.py        
 ├── data/
-│   ├── data_loader.py              
-│   ├── colors.py                   
-│   └── rd_provincias.geojson       
+│   ├── data_loader.py             
+│   ├── colors.py                  
+│   ├── rd_provincias.geojson      
+│   ├── datos_averias.csv          
+│   ├── datos_energia_entregada.csv 
+│   ├── datos_bajas_servicio.csv   
+│   ├── geo_unificado.csv          
+│   └── serie_edeeste.csv          
 ├── assets/
 │   └── logos/
-│       ├── edeeste.png             
-│       └── mem_logo.png            
-├── requirements.txt
-└── README.md
+│       ├── edeeste.png            
+│       └── mem_logo.png           
+├── requirements.txt               
+└── README.md                      
 ```
 
 ---
