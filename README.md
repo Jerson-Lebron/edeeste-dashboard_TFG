@@ -56,7 +56,7 @@ El dashboard muestra indicadores clave de EDEESTE como averías, bajas de servic
 ## Estructura del Proyecto
 
 ```
-dashboard-edeeste/
+edeeste-dashboard_TFG/
 ├── app.py
 ├── pages/
 │   ├── resumen.py                
@@ -91,8 +91,8 @@ dashboard-edeeste/
 1. Clonar o descargar el repositorio:
 
 ```bash
-git clone https://github.com/tu-usuario/dashboard-edeeste.git
-cd dashboard-edeeste
+git clone https://github.com/Jerson-Lebron/edeeste-dashboard_TFG.git
+cd edeeste-dashboard_TFG
 ```
 
 2. Crear entorno virtual:
