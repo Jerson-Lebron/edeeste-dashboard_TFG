@@ -55,13 +55,24 @@ with st.sidebar:
         key="anio_geo"
     )
     
-    provs_disp = sorted(averias["provincia"].unique().tolist())
+    metrica_mapa = st.selectbox(
+        "Métrica en el mapa",
+        ["Averías", "Bajas"],
+        index=0,
+        key="metrica_mapa"
+    )
+    if metrica_mapa == "Bajas":
+        provs_disp = sorted(bajas["provincia"].unique().tolist())
+    else:
+        provs_disp = sorted(averias["provincia"].unique().tolist())
+        
     prov_sel = st.multiselect(
         "Provincia", 
         provs_disp, 
         default=[],
         key="provincia_geo"
     )
+    
     
     if prov_sel:
         tipos_disp = sorted(
@@ -77,18 +88,18 @@ with st.sidebar:
         key="tipo_geo"
     )
 
-    metrica_mapa = st.selectbox(
-        "Métrica en el mapa",
-        ["Averías", "Bajas"],
-        index=0,
-        key="metrica_mapa"
-    )
+    
 
 
 current_averias = averias[
     (averias["anio"].isin(anio_sel)) &
     (averias["provincia"].isin(prov_sel) if prov_sel else True) &
     (averias["tipo de averia y emergencia"].isin(tipo_sel) if tipo_sel else True)
+].copy()
+
+current_bajas = bajas[
+    (bajas["anio"].isin(anio_sel)) &
+    (bajas["provincia"].isin(prov_sel) if prov_sel else True)
 ].copy()
 
 df_correlacion = geo[
@@ -113,20 +124,11 @@ with row1_1:
         mapa_datos = data_loader.transform_data_map(current_averias)
         titulo_metrica = "Averías"
         color_escala = ["#f7f7f7", "#fdcc8a", "#fc8d59", "#d73027"]
-    elif metrica_mapa == "Bajas":
-        bajas_agg = bajas[
-            (bajas["anio"].isin(anio_sel)) &
-            (bajas["provincia"].isin(prov_sel))
-        ].groupby("provincia")["bajas"].sum().reset_index()
-        bajas_agg.columns = ["provincia", "valor"]
-        mapa_datos = [{"name": f"Provincia {row['provincia']}", "value": row["valor"]} 
-                     for _, row in bajas_agg.iterrows()]
+    else:
+        mapa_datos = data_loader.transform_data_map(current_bajas, "bajas")
         titulo_metrica = "Bajas"
         color_escala = ["#f7f7f7", "#fdcc8a", "#fc8d59", "#d73027"]
-    else:
-        mapa_datos = []
-        titulo_metrica = "Pérdida %"
-        color_escala = ["#f7fcfd", "#bfd3e6", "#8c96c6", "#88419d"]
+   
 
     if not mapa_datos:
         st.warning("No hay datos para mostrar con este filtro.")
