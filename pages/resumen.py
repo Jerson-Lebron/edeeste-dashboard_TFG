@@ -38,6 +38,9 @@ serie_edeeste["fecha"] = pd.to_datetime(serie_edeeste["fecha"], format="%Y-%m-%d
 min_date = serie_edeeste["fecha"].min()
 max_date = serie_edeeste["fecha"].max()
 
+bajas["estado"] = bajas["estado"].map({"baja forzada" : "Forzada"
+    , "baja voluntaria": "Voluntaria"})
+
 st.header(":material/bar_chart: Dashboard de Eficiencia de Distribución - :yellow[EDEESTE]", divider="gray")
 st.markdown(f"Análisis integral de averías, pérdidas y bajas de servicio | **Periodo de Análisis:** {min_date.strftime('%d-%m-%Y')} - {max_date.strftime('%d-%m-%Y')}")
 st.caption("***Actualizado: 5/7/2026***")
@@ -50,9 +53,9 @@ with st.sidebar:
         ["1 Mes", "3 Meses", "6 Meses", "12 Meses", "Todo"],
         index=3,
         key="period",
-        bind="query-params", 
+        bind="query-params",
     )
-    
+
     if selected_period:
         selected_provincias = st.multiselect(
             "Provincia",
@@ -61,7 +64,7 @@ with st.sidebar:
             key="provincia",
             bind="query-params",
         )
-    
+
     if selected_provincias:
         tipo_options = sorted(
             list(averias[averias["provincia"].isin(selected_provincias)]["tipo de averia y emergencia"]
@@ -69,7 +72,7 @@ with st.sidebar:
         )
     else:
         tipo_options = sorted(list(averias["tipo de averia y emergencia"].unique()))
-    
+
     selected_tipos = st.multiselect(
         "Tipo de Avería",
         options=tipo_options,
@@ -86,7 +89,7 @@ period_offsets = {
     "24 Meses": 24,
 }
 
-fecha_fin = max_date 
+fecha_fin = max_date
 
 if selected_period == "1 Mes":
     fecha_inicio = pd.to_datetime("2025-12-01")
@@ -115,32 +118,32 @@ current_averias = apply_filters(averias, fecha_inicio, fecha_fin, selected_provi
 if fecha_inicio_anterior is not None:
     prev_averias = apply_filters(averias, fecha_inicio_anterior, fecha_fin_anterior, selected_provincias, selected_tipos)
 else:
-    prev_averias = None 
+    prev_averias = None
 
 current_bajas = apply_filters(bajas, fecha_inicio, fecha_fin, selected_provincias, False)
 if fecha_inicio_anterior is not None:
     prev_bajas = apply_filters(bajas, fecha_inicio_anterior, fecha_fin_anterior, selected_provincias, False)
 else:
-    prev_bajas = None 
+    prev_bajas = None
 
 current_geo = apply_filters(geo, fecha_inicio, fecha_fin, selected_provincias, False)
 if fecha_inicio_anterior is not None:
     prev_geo = apply_filters(geo, fecha_inicio_anterior, fecha_fin_anterior, selected_provincias, False)
 else:
-    prev_geo = None 
+    prev_geo = None
 
 current_energia = apply_filters(energia, fecha_inicio, fecha_fin, selected_provincias, False)
 if fecha_inicio_anterior is not None:
     prev_energia = apply_filters(energia, fecha_inicio_anterior, fecha_fin_anterior, selected_provincias, False)
 else:
-    prev_energia = None 
+    prev_energia = None
 
 current_serie_edeeste = apply_filters(serie_edeeste, fecha_inicio, fecha_fin, False, False)
 if fecha_inicio_anterior is not None:
     prev_serie_edeeste = apply_filters(serie_edeeste, fecha_inicio_anterior, fecha_fin_anterior, False, False)
 else:
-    prev_serie_edeeste = None 
-    
+    prev_serie_edeeste = None
+
 # Datos para los KPIs
 # ----------------------------------------------------
 current_kpis = {
@@ -201,10 +204,10 @@ with col2:
         delta=delta,
         delta_color="inverse",
         border=True,
-        chart_data=spark_bajas if spark_bajas else 0, 
+        chart_data=spark_bajas if spark_bajas else 0,
         chart_type="area",
     )
-    
+
 with col3:
     val = current_kpis['perdida_pct']
     delta = get_delta(val, prev_kpis['perdida_pct'])
@@ -217,7 +220,7 @@ with col3:
             chart_data=spark_perdida if spark_perdida else 0,
             chart_type="area",
         )
-        
+
 st.caption("**Nota:** El KPI de pérdida no se filtra por provincia ni por tipo de averías. El KPI de total de bajas no se fitra por tipo de averías")
 
 with col4:
@@ -236,7 +239,7 @@ with col4:
 # ---------------------------------------------------------------------
 st.subheader(":material/trending_up: ¿Cómo está evolucionando nuestra eficiencia energética?")
 st.caption("""
-**Evolución y composición energética:** Analiza la tendencia de la energía comprada, facturada y cobrada, 
+**Evolución y composición energética:** Analiza la tendencia de la energía comprada, facturada y cobrada,
 y visualiza la proporción entre pérdidas y energía facturada para identificar desviaciones y patrones de eficiencia.
 """)
 
@@ -252,7 +255,7 @@ with row1_1:
     cobrada = datos["cobrada_GWh"].to_list()
     perdida = datos["perdida_GWh"].to_list()
     facturada = datos["facturada_GWh"].to_list()
-    
+
     trend_opts = {
         "title": {
             "text": "Evolución de Indicadores Energéticos",
@@ -333,19 +336,19 @@ with row1_1:
     }
 
     st_echarts(options=trend_opts, height="400px", key="trend_energy", theme="streamlit")
-    
+
 # Grafico de Donut: Distribucion de energía comprada
 # ----------------------------------------------------
 with row1_2:
     total_comprada = current_serie_edeeste["comprada_GWh"].sum()
     total_facturada = current_serie_edeeste["facturada_GWh"].sum()
     total_perdida = current_serie_edeeste["perdida_GWh"].sum()
-    
+
     pie_data = [
         {"name": "Energía Facturada", "value": round(total_facturada, 2)},
         {"name": "Pérdida de Energía", "value": round(total_perdida, 2)}
     ]
-    
+
     pie_opts = {
         "title": {
             "text": "Distribución de Energía Comprada",
@@ -392,7 +395,7 @@ with row1_2:
     }
 
     st_echarts(options=pie_opts, height="400px", key="pie_perdidas", theme="streamlit")
-    
+
 st.caption("**Nota:** Los gráficos de esta sección muestran datos agregados de EDEESTE y no se filtran por provincia ni por tipo de averías.")
 
 # Seccion 2: Averias por provincia
@@ -439,9 +442,9 @@ with row2_1:
                 for item in mapa_datos
                 if item["value"] is not None and item["value"] > 0
                 ]
-            
+
             color_escala = ["#f7f7f7", "#fdcc8a", "#fc8d59", "#d73027"]
-            
+
             titulo = "Distribución de Averías"
             map_opts = {
                 "title": {
@@ -498,9 +501,9 @@ with row2_1:
 with row2_2:
     stacked_datos = current_averias.groupby(["provincia", "tipo de averia y emergencia"])["averias"].sum().reset_index()
     provincias_ordenadas = stacked_datos.groupby('provincia')["averias"].sum().sort_values(ascending=False).index.tolist()
-    
+
     tipos_averia = sorted(stacked_datos["tipo de averia y emergencia"].unique().tolist())
-    
+
     series_data = []
     for tipo in tipos_averia:
         tipo_data = stacked_datos[stacked_datos["tipo de averia y emergencia"] == tipo]
@@ -508,9 +511,9 @@ with row2_2:
         for provincia in provincias_ordenadas:
             valor = tipo_data[tipo_data['provincia'] == provincia]['averias'].sum()
             valores.append(float(valor) if not pd.isna(valor) else 0)
-        
+
         color = COLORES_TIPOS_AVERIA.get(tipo, COLORES["otro"])
-        
+
         series_data.append({
             "name": tipo,
             "type": "bar",
@@ -519,7 +522,7 @@ with row2_2:
             "itemStyle": {"color": color},
             "emphasis": {"focus": "series"}
         })
-    
+
     stacked_opts = {
         "title": {
             "text": "Averías por Tipo y Provincia",
@@ -583,7 +586,7 @@ with row2_2:
 # -------------------------------------------------------------------------
 st.subheader(":material/assessment: Análisis de Bajas")
 st.caption("""
-**Visualiza la evolución temporal de las bajas**, su composición por estado y provincia, 
+**Visualiza la evolución temporal de las bajas**, su composición por estado y provincia,
 y la distribución general de estados para identificar patrones y áreas críticas.
 """)
 
@@ -600,7 +603,7 @@ if not current_bajas.empty:
     COLOR_FORZADA = COLORES["forzada"]
     COLOR_VOLUNTARIA = COLORES["voluntaria"]
     COLOR_TOTAL = COLORES["bajas"]
-    
+
     # Grafico de Lineas: Bajas por estado (baja forzada, baja voluntaria)
     # ___________________________________________________________________
     with row3_1:
@@ -653,7 +656,7 @@ if not current_bajas.empty:
             },
             "tooltip": {"trigger": "axis"},
             "legend": {
-                "data": ["Total", "baja forzada", "baja voluntaria"],
+                "data": ["Total", "Forzada", "Voluntaria"],
                 "bottom": 0, "type": "scroll"
             },
             "xAxis": {
@@ -712,13 +715,13 @@ if not current_bajas.empty:
                         ]
                     }
                 },
-                serie_estado("baja forzada", COLOR_FORZADA),
-                serie_estado("baja voluntaria", COLOR_VOLUNTARIA),
+                serie_estado("Forzada", COLOR_FORZADA),
+                serie_estado("Voluntaria", COLOR_VOLUNTARIA),
             ]
         }
 
         st_echarts(options=line_opts, height="420px", key="bajas_linea")
-        
+
     # Barras apiladas por estado y provincia
     # _______________________________________
     with row3_2:
@@ -728,7 +731,7 @@ if not current_bajas.empty:
             .sum()
             .reset_index()
             )
-        
+
         orden_prov = (
             comp.groupby("provincia")["bajas"]
             .sum()
@@ -789,7 +792,7 @@ if not current_bajas.empty:
                     )
                 },
             "legend": {
-                "data": ["baja forzada", "baja voluntaria"],
+                "data": ["Forzada", "Voluntaria"],
                 "bottom": 0
                 },
             "grid": {
@@ -813,13 +816,13 @@ if not current_bajas.empty:
                     }
                 },
             "series": [
-                serie_barras("baja forzada", COLOR_FORZADA),
-                serie_barras("baja voluntaria", COLOR_VOLUNTARIA),
+                serie_barras("Forzada", COLOR_FORZADA),
+                serie_barras("Voluntaria", COLOR_VOLUNTARIA),
                 ]
             }
 
         st_echarts(options=bar_opts, height="420px", key="bajas_barras")
-    
+
     # Grafico de Donut: Distribucion de las bajas
     # __________________________________
     with row3_3:
@@ -831,7 +834,7 @@ if not current_bajas.empty:
         )
 
         data_donut = []
-        for estado, color in [("baja forzada", COLOR_FORZADA), ("baja voluntaria", COLOR_VOLUNTARIA)]:
+        for estado, color in [("Forzada", COLOR_FORZADA), ("Voluntaria", COLOR_VOLUNTARIA)]:
             fila = totales[totales["estado"] == estado]["bajas"]
             val = int(fila.sum()) if not fila.empty else 0
             data_donut.append({
@@ -882,7 +885,7 @@ if not current_bajas.empty:
 
 else:
     st.warning("""
-               **No se encontraron datos disponibles**  
-               La fuente de datos *Estadísticas de Bajas o Cancelaciones de Contratos de Servicios 2017 - 2026* no contiene registros para los filtros seleccionados.  
+               **No se encontraron datos disponibles**
+               La fuente de datos *Estadísticas de Bajas o Cancelaciones de Contratos de Servicios 2017 - 2026* no contiene registros para los filtros seleccionados.
                Por favor, ajusta los filtros o verifica la disponibilidad de información en el período consultado.
                """)
