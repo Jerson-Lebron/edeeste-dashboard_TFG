@@ -1,0 +1,11 @@
+[theme]
+base="light"
+font = "'Work Sans':https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&display=swap"
+baseRadius = "12px"
+
+[theme.sidebar]
+base = "dark"
+primaryColor = "#1f77b4"
+backgroundColor = "#1e293b"
+textColor = "#f1f5f9"
+secondaryBackgroundColor = "#334155"
